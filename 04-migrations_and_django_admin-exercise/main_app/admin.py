@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from main_app.models import EventRegistration, Movie, Student, Supplier, Course
+from main_app.models import EventRegistration, Movie, Student, Supplier, Course, Person, Item, Smartphone, Order
 
 
 @admin.register(EventRegistration)
@@ -58,4 +58,24 @@ class CourseAdmin(admin.ModelAdmin):
             'fields': ('description',)
         })
     )
-    readonly_fields = ('start_date', )
+    readonly_fields = ('start_date',)
+
+
+@admin.register(Person)
+class PersonAdmin(admin.ModelAdmin):
+    ...
+
+
+@admin.register(Item)
+class ItemAdmin(admin.ModelAdmin):
+    ...
+
+
+@admin.register(Smartphone)
+class SmartphoneAdmin(admin.ModelAdmin):
+    ...
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    ...
