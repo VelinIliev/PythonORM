@@ -2,6 +2,7 @@ from django.db import models
 
 
 # Create your models here.
+
 class Pet(models.Model):
     name = models.CharField(
         max_length=40
@@ -21,7 +22,7 @@ class Artifact(models.Model):
     age = models.PositiveIntegerField()
     description = models.TextField()
     is_magical = models.BooleanField(
-        default=False
+        default=True
     )
 
 
@@ -95,11 +96,13 @@ class Character(models.Model):
         max_length=100
     )
     class_name = models.CharField(
+        max_length=10,
         choices=(
             ('Mage', 'Mage'),
             ('Warrior', 'Warrior'),
             ('Assassin', 'Assassin'),
-            ('Scout', 'Scout')
+            ('Scout', 'Scout'),
+            ('Fusion', 'Fusion')
         )
     )
     level = models.PositiveIntegerField()
@@ -107,4 +110,6 @@ class Character(models.Model):
     dexterity = models.PositiveIntegerField()
     intelligence = models.PositiveIntegerField()
     hit_points = models.PositiveIntegerField()
-    inventory = models.TextField()
+    inventory = models.TextField(
+        default='The inventory is empty'
+    )
