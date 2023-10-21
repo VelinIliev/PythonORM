@@ -2,6 +2,7 @@
 
 *.docx
 .idea/
+*.zip
 
 ### OSX ###
 .DS_Store
