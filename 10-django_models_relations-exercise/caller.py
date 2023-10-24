@@ -184,6 +184,7 @@ def get_drivers_with_expired_licenses(due_date):
 
     return expired_drivers
 
+
 # # Create drivers
 # driver1 = Driver.objects.create(first_name="Tanya", last_name="Petrova")
 # driver2 = Driver.objects.create(first_name="Ivan", last_name="Yordanov")
@@ -203,14 +204,17 @@ def get_drivers_with_expired_licenses(due_date):
 
 # 05. Car Registration
 
-def register_car_by_owner(owner: object):
-    registration = Registration.objects.filter(car_id__isnull=True).first()
-    car = Car.objects.filter(owner_id__isnull=True).first()
-    registration.registration_date = date.today()
-    registration.car = car
-    car.owner = owner
-    return f'Successfully registered {car.model} to {owner.name} ' \
-           f'with registration number {registration.registration_number}.'
+def register_car_by_owner(owner):
+    registration = Registration.objects.filter(car__isnull=True).first()
+    car = Car.objects.filter(registration__isnull=True).first()
+
+    if registration and car:
+        car.registration = registration
+        registration.registration_date = date.today()
+        car.save()
+        registration.save()
+
+        return f"Successfully registered {car.model} to {owner.name} with registration number {registration.registration_number}."
 
 
 # # Create instances of the Owner model

@@ -92,7 +92,8 @@ class Car(models.Model):
         to=Owner,
         on_delete=models.CASCADE,
         null=True,
-        blank=True
+        blank=True,
+        related_name='cars'
     )
 
 
@@ -109,5 +110,8 @@ class Registration(models.Model):
         to=Car,
         on_delete=models.CASCADE,
         null=True,
-        blank=True
+        blank=True,
+        related_name='registration'
     )
+
+
