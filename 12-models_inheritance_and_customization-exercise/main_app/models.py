@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -142,3 +143,24 @@ class Message(models.Model):
         new_message.save()
         return new_message
 
+
+class Student(models.Model):
+    name = models.CharField(
+        max_length=100,
+    )
+    student_id = models.PositiveIntegerField(
+        primary_key=True
+
+    )
+
+    def save(self, *args, **kwargs):
+        if type(self.student_id) == int:
+            self.student_id = abs(self.student_id)
+        elif type(self.student_id) == str:
+            if self.student_id.isnumeric():
+                self.student_id = abs(int(self.student_id))
+            else:
+                raise ValidationError("ID can't contain letters and symbols")
+        elif type(self.student_id) == float:
+            self.student_id = abs(int(self.student_id))
+        super(Student, self).save(*args, **kwargs)
