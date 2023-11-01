@@ -280,7 +280,7 @@ class RegularReservation(BaseReservation):
 class SpecialReservation(RegularReservation):
 
     def save(self, *args, **kwargs):
-        
+
         check_dates(self.start_date, self.end_date)
         check_overlapping(self.room, self.start_date, self.end_date, self.__class__.__name__)
 
