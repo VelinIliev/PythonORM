@@ -106,8 +106,6 @@ class Music(BaseMedia):
         verbose_name_plural = 'Models of type - Music'
 
 
-# TODO: 87/100
-
 class Product(models.Model):
     name = models.CharField(
         max_length=100
@@ -120,7 +118,8 @@ class Product(models.Model):
     def calculate_tax(self):
         return self.price * Decimal(0.08)
 
-    def calculate_shipping_cost(self, weight: Decimal):
+    @staticmethod
+    def calculate_shipping_cost(weight: Decimal):
         return weight * Decimal(2.00)
 
     def format_product_name(self):
@@ -128,13 +127,17 @@ class Product(models.Model):
 
 
 class DiscountedProduct(Product):
+    class Meta:
+        proxy = True
+
     def calculate_price_without_discount(self):
         return self.price * Decimal(1.20)
 
     def calculate_tax(self):
         return self.price * Decimal(0.05)
 
-    def calculate_shipping_cost(self, weight: Decimal):
+    @staticmethod
+    def calculate_shipping_cost(weight: Decimal):
         return weight * Decimal(1.50)
 
     def format_product_name(self):
@@ -145,7 +148,6 @@ class RechargeEnergyMixin:
     def recharge_energy(self, amount):
         self.energy = min(self.energy + amount, 100)
         self.save()
-
 
 
 # TODO: 71/100
