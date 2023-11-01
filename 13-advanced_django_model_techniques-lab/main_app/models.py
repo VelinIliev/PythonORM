@@ -76,17 +76,21 @@ class Menu(models.Model):
 
 
 class ReviewMixin(models.Model):
-    rating = models.PositiveIntegerField(validators=[validators.MaxValueValidator(5)])
+    reviewer_name = models.CharField(
+        max_length=100
+    )
+    rating = models.PositiveIntegerField(validators=[validators.MaxValueValidator(
+        limit_value=5,
+        message=f'Rating cannot exceed 5.'
+    )])
     review_content = models.TextField()
 
     class Meta:
         abstract = True
+        ordering = ['-rating']
 
 
-class RestaurantReview(ReviewMixin, models.Model):
-    reviewer_name = models.CharField(
-        max_length=100
-    )
+class RestaurantReview(ReviewMixin):
     restaurant = models.ForeignKey(
         to=Restaurant,
         on_delete=models.CASCADE
@@ -116,8 +120,7 @@ class FoodCriticRestaurantReview(RestaurantReview):
         unique_together = ('reviewer_name', 'restaurant')
 
 
-class MenuReview(ReviewMixin, models.Model):
-    reviewer_name = models.CharField(max_length=100)
+class MenuReview(ReviewMixin):
     menu = models.ForeignKey(Menu, on_delete=models.CASCADE)
 
     class Meta:
@@ -128,3 +131,6 @@ class MenuReview(ReviewMixin, models.Model):
         indexes = [
             models.Index(fields=['menu'], name='main_app_menu_review_menu_id'),
         ]
+
+    def __str__(self):
+        return f"{self.reviewer_name}'s Review for {self.menu.name}"
