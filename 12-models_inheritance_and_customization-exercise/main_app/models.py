@@ -221,6 +221,26 @@ class Room(models.Model):
         return f'Room {self.number} created successfully'
 
 
+def check_dates(start_date, end_date):
+    if start_date >= end_date:
+        raise ValidationError("Start date cannot be after or in the same end date")
+
+
+def check_overlapping(room, start_date, end_date, class_type):
+    class_types = {
+        'RegularReservation': RegularReservation,
+        'SpecialReservation': SpecialReservation
+    }
+    overlapping_reservations = class_types[class_type].objects.filter(
+        room=room,
+        start_date__lte=end_date,
+        end_date__gte=start_date
+    )
+
+    if overlapping_reservations:
+        raise ValidationError(f'Room {room.number} cannot be reserved')
+
+
 class BaseReservation(models.Model):
     room = models.ForeignKey(
         to=Room,
@@ -243,34 +263,33 @@ class BaseReservation(models.Model):
 
 
 class RegularReservation(BaseReservation):
-    class Meta:
-        verbose_name = "Regular reservation"
-        verbose_name_plural = "Regular reservations"
 
     def save(self, *args, **kwargs):
-        if self.start_date >= self.end_date:
-            raise ValidationError('Start date cannot be after or in the same end date')
 
-        overlapping_reservations = RegularReservation.objects.filter(
-            room=self.room,
-            start_date__lte=self.end_date,
-            end_date__gte=self.start_date
-        )
-
-        if overlapping_reservations:
-            raise ValidationError(f'Room {self.room.number} cannot be reserved')
+        check_dates(self.start_date, self.end_date)
+        check_overlapping(self.room, self.start_date, self.end_date, self.__class__.__name__)
 
         super(RegularReservation, self).save(*args, **kwargs)
 
-        return f'{self._meta.verbose_name} for room {self.room.number}'
+        return f'Regular reservation for room {self.room.number}'
+
+    def __str__(self):
+        return self.__class__.__name__
 
 
 class SpecialReservation(RegularReservation):
-    class Meta:
-        verbose_name = "Special reservation"
-        verbose_name_plural = "Special reservations"
+
+    def save(self, *args, **kwargs):
+        
+        check_dates(self.start_date, self.end_date)
+        check_overlapping(self.room, self.start_date, self.end_date, self.__class__.__name__)
+
+        super(SpecialReservation, self).save(*args, **kwargs)
+
+        return f'Special reservation for room {self.room.number}'
 
     def extend_reservation(self, days: int):
+
         new_end_date = self.end_date + timedelta(days=days)
 
         overlapping_reservations = RegularReservation.objects.filter(
@@ -286,3 +305,6 @@ class SpecialReservation(RegularReservation):
         self.save()
 
         return f"Extended reservation for room {self.room.number} with {days} days"
+
+    def __str__(self):
+        return self.__class__.__name__
